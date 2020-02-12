@@ -3,14 +3,36 @@ library(shiny)
 
 ui <- fluidPage(
   withMathJax(),
-  tags$div(HTML("
-                ")),
-  helpText('An irrational number $\sqrt{2}$
-           and a fraction $$1-\\frac{1}{2}$$')
+  # Insert this tag to allow inline MathJax
+  tags$div(HTML("<script type='text/x-mathjax-config' >
+            MathJax.Hub.Config({
+            tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+            });
+            </script >
+            ")),
+  h1("Clue:"),
+  uiOutput('clue'),
+  uiOutput('rev_sol'),
+  br(),
+  actionButton('next_clue', 'Next Clue!')
 )
 
 server <- function(input, output, session) {
+  clues_sols <- reactive(Tseries)
+  # Need a random ordering of the dataset
+  order <- reactive(sample(seq_along(Tseries$Clue)))
   
+  #current <- reactive(order[input$next])
+  
+  output$clue <- renderUI({
+    withMathJax(
+      purrr::map(clues_sols()[order()[input$next_clue], 1, drop = TRUE], helpText)
+    )
+  })
+  
+  output$rev_sol <- renderUI({
+    actionButton('reveal', 'Reveal Solution')
+  })
 }
 
 shinyApp(ui, server)
