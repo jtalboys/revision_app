@@ -10,7 +10,6 @@ ui <- fluidPage(
             });
             </script >
             ")),
-  h1("Clue:"),
   uiOutput('clue'),
   uiOutput('rev_sol'),
   br(),
@@ -22,11 +21,9 @@ server <- function(input, output, session) {
   # Need a random ordering of the dataset
   order <- reactive(sample(seq_along(Tseries$Clue)))
   
-  #current <- reactive(order[input$next])
-  
   output$clue <- renderUI({
     withMathJax(
-      purrr::map(clues_sols()[order()[input$next_clue], 1, drop = TRUE], helpText)
+      helpText(clues_sols()[order()[input$next_clue], 1, drop = TRUE])
     )
   })
   
@@ -43,7 +40,7 @@ server <- function(input, output, session) {
                {
                  output$rev_sol <- renderUI({
                    withMathJax(
-                     purrr::map(clues_sols()[order()[input$next_clue], 2, drop = TRUE], helpText)
+                     helpText(clues_sols()[order()[input$next_clue], 2, drop = TRUE])
                    )
                  })
                })
