@@ -30,9 +30,23 @@ server <- function(input, output, session) {
     )
   })
   
-  output$rev_sol <- renderUI({
-    actionButton('reveal', 'Reveal Solution')
-  })
+  output$rev_sol <- renderUI({})
+  
+  observeEvent(input$next_clue, 
+               {
+                 output$rev_sol <- renderUI({
+                   actionButton('reveal', 'Reveal Solution')
+                 })
+               })
+  
+  observeEvent(input$reveal, 
+               {
+                 output$rev_sol <- renderUI({
+                   withMathJax(
+                     purrr::map(clues_sols()[order()[input$next_clue], 2, drop = TRUE], helpText)
+                   )
+                 })
+               })
 }
 
 shinyApp(ui, server)
